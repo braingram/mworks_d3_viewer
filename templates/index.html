@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Zoom + Pan</title>
+<script src="static/d3/d3.v2.js"></script>
+<script src="static/jquery-1.7.2.min.js"></script>
+<script src="static/zoom_points.js"></script>
+<style>
+
+svg {
+  font: 10px sans-serif;
+  shape-rendering: crispEdges;
+}
+
+rect {
+  fill: #ddd;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #fff;
+}
+
+path.dot {
+    fill: white;
+    stroke-width: 1.5px;
+    /* this might slow things down */
+    /* shape-rendering: geometricPrecision; */
+}
+
+circle.dot {
+    fill: white;
+    stroke-width: 1.5px;
+}
+
+li {
+    list-style: none;
+}
+
+li.selected {
+    color: #f00;
+}
+
+</style>
+<body>
+    <ul style="float: left">
+    {% for name in names %}
+        <li class="event">{{ name }}</li>
+    {% endfor %}
+    </ul>
+<script>
+    SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
+    function draw_event(names) {
+        d3.json(SCRIPT_ROOT + "/events/" + escape(names.join(' ')), draw);
+    };
+
+    //names = ["success", "failure", "ignore", "gaze_h", "gaze_v", "#stimDisplayUpdate"];
+    names = ["success", "failure", "ignore", "#stimDisplayUpdate"];
+    $.each(names, function (i, name) {
+        $('li:contains(' + name + ')').addClass('selected');
+    });
+    draw_event(names);
+
+    $('li.event').click(function (li) {
+        name = this.innerHTML;
+        var index = $.inArray(name, names);
+        obj = $(this);
+        if (index != -1) {
+            names.splice(index, 1);
+            $(this).removeClass('selected');
+            draw_event(names);
+        } else {
+            names.push(name);
+            $(this).addClass('selected');
+            draw_event(names);
+        };
+    });
+
+    // TODO make events selectable
+    //draw_event("gaze_h|gaze_v");
+    //draw_event("#stimDisplayUpdate");
+    //draw_event("success|failure|ignore|gaze_h|gaze_v");
+    //draw_event("gaze_h|gaze_v");
+
+//d3.json("http://localhost:{{ port }}/{{ name }}.json", draw);
+//var data = d3.range(100).map(function(i) {
+//    return {x: i - 50, y: Math.random() * 100 - 50};
+//});
+
+//draw(data);
+
+</script>
+</body>
