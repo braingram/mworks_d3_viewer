@@ -69,7 +69,10 @@ function draw (data) {
         .attr("stroke", function(d, i) { return color(y(d.name)); })
         .attr("cx", function(d) { return x(d.time); })
         .attr("cy", function(d) { return y(d.name); })
-        .attr("r", 4);
+        .attr("visibility", function(d) { return x(d.time) < 0 ? 'hidden' : 'visible'; })
+        .attr("r", 4)
+        .on("mouseover", popup())
+        .on("mouseout", destroy_popup());
     /*
     svg.selectAll("path.dot")
         .data(data)
@@ -80,10 +83,32 @@ function draw (data) {
         .attr("d", d3.svg.symbol()
         .type(function(d, i) { return symbol('circle'); }));
 */
+    function popup() {
+        return function(d) {
+            svg.selectAll(".popup")
+                .data([d])
+              .enter().append("text")
+                .attr("class", "popup")
+                .attr("x", function(d) { return x(d.time); })
+                .attr("y", function(d) { return y(d.name); })
+                .attr("dx", "2em")
+                .attr("dy", "-2em")
+                .text(function(d) { return d.name + ", Time: " + d.time + ", Value: " + d.value });
+        };
+    }
+
+    function destroy_popup() {
+        return function() {
+            svg.selectAll(".popup")
+                .remove();
+        };
+    }
+
     function zoom() {
       svg.select(".x.axis").call(xAxis);
       svg.selectAll("circle.dot")
-          .attr("cx", function (d) { return x(d.time); });
+          .attr("cx", function (d) { return x(d.time); })
+          .attr("visibility", function (d) { return x(d.time) < 0 ? 'hidden' : 'visible'; });
       //svg.select(".y.axis").call(yAxis);
       //svg.selectAll("path.dot")
       //  .attr("transform", function(d) { return "translate(" + x(d.time) + "," + y(d.name) + ")"; });

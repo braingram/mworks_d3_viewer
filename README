@@ -1,0 +1,11 @@
+Install
+------
+
+pip install -r requirements.txt
+
+Run
+---
+
+From the source directory:
+
+python show.py <mwk_file_name>
