@@ -8,6 +8,10 @@ import flask
 
 import pymworks
 
+
+#MAXEVENTS = 10000000
+MAXEVENTS = None
+
 fn = '/home/graham/Repositories/braingram/pymworks/test/error.mwk'
 if len(sys.argv) > 1:
     fn = sys.argv[1]
@@ -21,9 +25,14 @@ app = flask.Flask(__name__)
 
 
 def events_to_json(events):
+    if (MAXEVENTS is not None) and (len(events) > MAXEVENTS):
+        s = slice(0, len(events), len(events) / MAXEVENTS + 1)
+    else:
+        s = slice(len(events))
+
     return json.dumps([{'code': e.code, 'time': e.time / float(1E6), \
             'value': e.value, 'name': datafile.to_name(e.code)} \
-            for e in events])
+            for e in events[s]])
 
 
 @app.route('/events/')

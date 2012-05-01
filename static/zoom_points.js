@@ -24,8 +24,13 @@ function draw (data) {
         .domain([ymin - yrange * .05, ymax + yrange * .05])
         .range([height, 0]);
     */
-    
-    var names = $.unique($.map(data, function (d) { return d.name } ));
+    var names = [];
+    for (i in data) {
+        if (!(data[i].name in names)) {
+            names.push(data[i].name);
+        };
+    };
+    //var names = $.unique($.map(data, function (d) { return d.name } ));
     var y = d3.scale.ordinal()
         .domain(names)
         .rangePoints([height,0], 1.0);
